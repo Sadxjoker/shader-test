@@ -135,13 +135,25 @@ alert("trigonometric and inverse trigonometric functions test.\ncreated by cznul
     "   return 20.0 - dot(a, a) + sum * 0.00002;\n" +
     "}";
     var vertshade;
+    var stopStress = false;
+    var stressStart = 0;
+    var STRESS_MS = 900000;
     var fragshader;
     var shaderProgram;
     function ontimer() {
-        ang1+=0.01;
-        draw();
-        window.requestAnimationFrame(ontimer);
+    if (stopStress) return;
+
+    if (stressStart === 0) stressStart = performance.now();
+    if (performance.now() - stressStart >= STRESS_MS) {
+        stopStress = true;
+        alert("Stress test complete");
+        return;
     }
+
+    ang1 += 0.01;
+    draw();
+    window.requestAnimationFrame(ontimer);
+}
     document.addEventListener("mousedown",
         function (ev) {
             var oEvent = ev || event;
@@ -331,8 +343,8 @@ alert("trigonometric and inverse trigonometric functions test.\ncreated by cznul
             "#define PI 3.14159265358979324\n" +
             "#define M_L 0.3819660113\n" +
             "#define M_R 0.6180339887\n" +
-            "#define MAXR 8\n" +
-            "#define SOLVER 8\n" +
+            "#define MAXR 14\n" +
+            "#define SOLVER 14\n" +
             "precision highp float;\n" +
             "float kernal(vec3 ver)\n;" +
             "uniform vec3 right, forward, up, origin;\n" +
@@ -352,7 +364,7 @@ alert("trigonometric and inverse trigonometric functions test.\ncreated by cznul
             "   sign=0;"+
             "   v1 = kernal(origin + dir * (step*len));\n" +
             "   v2 = kernal(origin);\n" +
-            "   for (int k = 2; k < 1002; k++) {\n" +
+            "   for (int k = 2; k < 1800; k++) {\n" +
             "      ver = origin + dir * (step*len*float(k));\n" +
             "      v = kernal(ver);\n" +
             "      if (v > 0.0 && v1 < 0.0) {\n" +
@@ -505,7 +517,7 @@ alert("trigonometric and inverse trigonometric functions test.\ncreated by cznul
         gl.vertexAttribPointer(glposition, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(glposition);
 
-        gl.viewport(0, 0, 1024, 1024);
+        gl.viewport(0, 0, 2560, 2560);
         draw();
         window.requestAnimationFrame(ontimer);
         document.getElementById("kernel").value = KERNEL;
